@@ -1196,6 +1196,26 @@ const SUPABASE_ANON_KEY =
   "sb_publishable_7K3lK77rwFpunFrW_9TK0Q_Tu-bcgv9";
 
 
+/* =========================================================
+   EDGE FUNCTIONS
+========================================================= */
+
+const ADMIN_AUTH_URL =
+  `${SUPABASE_URL}/functions/v1/admin-auth`;
+
+
+const APPROVE_WITHDRAWAL_URL =
+  `${SUPABASE_URL}/functions/v1/approve-withdrawal-admin`;
+
+
+const REJECT_WITHDRAWAL_URL =
+  `${SUPABASE_URL}/functions/v1/reject-withdrawal-admin`;
+
+
+const PROCESS_WITHDRAWAL_URL =
+  `${SUPABASE_URL}/functions/v1/process-withdrawals-v2`;
+
+
 /*
  * IMPORTANTE:
  *
@@ -2657,28 +2677,6 @@ async function executeWithdrawalOperation(
   withdrawalId
 ){
 
-  const numericWithdrawalId =
-    Number(withdrawalId);
-
-
-  if(
-    !Number.isInteger(numericWithdrawalId) ||
-    numericWithdrawalId <= 0
-  ){
-
-    showToast(
-      "ID de retiro inválido."
-    );
-
-    console.error(
-      "❌ withdrawal_id inválido:",
-      withdrawalId
-    );
-
-    return;
-  }
-
-
   if(
     !AdminState.authenticated
   ){
@@ -2705,23 +2703,21 @@ async function executeWithdrawalOperation(
 
   AdminState.activeOperation = {
     operation,
-    withdrawalId:
-      numericWithdrawalId
+    withdrawalId
   };
 
 
   try{
 
-    const url =
-      ADMIN_WITHDRAWALS_URL;
-
+    let url;
 
     let message;
 
 
-    if(
-      operation === "approve"
-    ){
+    if(operation === "approve"){
+
+      url =
+        APPROVE_WITHDRAWAL_URL;
 
       message =
         "Aprobando retiro...";
@@ -2729,9 +2725,10 @@ async function executeWithdrawalOperation(
     }
 
 
-    if(
-      operation === "reject"
-    ){
+    if(operation === "reject"){
+
+      url =
+        REJECT_WITHDRAWAL_URL;
 
       message =
         "Rechazando retiro...";
@@ -2739,9 +2736,10 @@ async function executeWithdrawalOperation(
     }
 
 
-    if(
-      operation === "process"
-    ){
+    if(operation === "process"){
+
+      url =
+        PROCESS_WITHDRAWAL_URL;
 
       message =
         "Procesando retiro...";
@@ -2754,15 +2752,15 @@ async function executeWithdrawalOperation(
     );
 
 
-    const result =
+    let result;
+
+
+    result =
       await adminEdgeRequest(
         url,
         {
-          action:
-            operation,
-
           withdrawal_id:
-            numericWithdrawalId
+            withdrawalId
         }
       );
 
