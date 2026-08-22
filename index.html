@@ -1,1174 +1,3172 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
+<meta charset="UTF-8">
 
-  <meta
-    name="theme-color"
-    content="#0f172a"
-  >
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
-  <title>CryptoMine Admin</title>
+<meta
+  name="theme-color"
+  content="#0f172a"
+>
 
-  <!-- =========================================================
-       TELEGRAM WEB APP SDK
-       ========================================================= -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>CryptoMine Admin</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    html,
-    body {
-      min-height: 100%;
-    }
+<style>
 
-    body {
-      min-height: 100vh;
-      background: #0f172a;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
-    }
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-    button {
-      font-family: inherit;
-    }
+html,
+body{
+  min-height:100%;
+}
 
-    .app {
-      min-height: 100vh;
-      padding: 20px;
-      padding-bottom: 40px;
-    }
+body{
+  min-height:100vh;
+  background:#0f172a;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
 
-    /* =========================================================
-       HEADER
-       ========================================================= */
+button,
+input,
+select{
+  font-family:inherit;
+}
 
-    .header {
-      margin-bottom: 25px;
-    }
+button{
+  cursor:pointer;
+}
 
-    .header h1 {
-      font-size: 26px;
-      margin-bottom: 6px;
-    }
+.app{
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+  min-height:100vh;
+  padding:20px;
+  padding-bottom:50px;
+}
 
-    .header p {
-      color: #94a3b8;
-      font-size: 14px;
-    }
+/* =========================================================
+   HEADER
+========================================================= */
 
-    /* =========================================================
-       STATUS
-       ========================================================= */
+.header{
+  margin-bottom:22px;
+}
 
-    .status {
-      padding: 15px;
-      border-radius: 14px;
-      background: #111827;
-      border: 1px solid #1e293b;
-      margin-bottom: 20px;
-      transition: 0.2s ease;
-    }
+.header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
 
-    .status span {
-      color: #f59e0b;
-      font-weight: bold;
-    }
+.header h1{
+  font-size:27px;
+  margin-bottom:5px;
+}
 
-    .status.success {
-      border-color: rgba(34, 197, 94, 0.35);
-    }
+.header p{
+  color:#94a3b8;
+  font-size:14px;
+}
 
-    .status.success span {
-      color: #22c55e;
-    }
+.refresh-main{
+  border:1px solid #334155;
+  background:#111827;
+  color:#fff;
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:bold;
+}
 
-    .status.error {
-      border-color: rgba(239, 68, 68, 0.35);
-    }
+.refresh-main:active{
+  transform:scale(.97);
+}
 
-    .status.error span {
-      color: #ef4444;
-    }
+/* =========================================================
+   STATUS
+========================================================= */
 
-    /* =========================================================
-       PANEL
-       ========================================================= */
+.status{
+  padding:15px;
+  border-radius:14px;
+  background:#111827;
+  border:1px solid #1e293b;
+  margin-bottom:20px;
+  transition:.2s ease;
+}
 
-    .panel {
-      background: #111827;
-      border: 1px solid #1e293b;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
+.status span{
+  color:#f59e0b;
+  font-weight:bold;
+}
 
-    .panel h2 {
-      font-size: 19px;
-      margin-bottom: 10px;
-    }
+.status.success{
+  border-color:rgba(34,197,94,.35);
+}
 
-    .panel p {
-      color: #94a3b8;
-      font-size: 14px;
-      line-height: 1.5;
-    }
+.status.success span{
+  color:#22c55e;
+}
 
-    /* =========================================================
-       ADMIN INFORMATION
-       ========================================================= */
+.status.error{
+  border-color:rgba(239,68,68,.35);
+}
 
-    .admin-info {
-      display: none;
-      background: #0b1220;
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
+.status.error span{
+  color:#ef4444;
+}
 
-    .admin-info.visible {
-      display: block;
-    }
+.loading{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#94a3b8;
+  font-size:14px;
+  margin-top:12px;
+}
 
-    .admin-info-title {
-      font-size: 13px;
-      color: #64748b;
-      margin-bottom: 8px;
-    }
+.spinner{
+  width:17px;
+  height:17px;
+  border:2px solid #334155;
+  border-top-color:#3b82f6;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
 
-    .admin-info-name {
-      font-size: 17px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
 
-    .admin-info-id {
-      font-size: 13px;
-      color: #94a3b8;
-      word-break: break-all;
-    }
+/* =========================================================
+   ADMIN INFO
+========================================================= */
 
-    /* =========================================================
-       AUTH LOADING
-       ========================================================= */
+.admin-info{
+  display:none;
+  background:#0b1220;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:20px;
+}
 
-    .loading {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #94a3b8;
-      font-size: 14px;
-      margin-top: 12px;
-    }
+.admin-info.visible{
+  display:block;
+}
 
-    .spinner {
-      width: 17px;
-      height: 17px;
-      border: 2px solid #334155;
-      border-top-color: #3b82f6;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+.admin-info-title{
+  color:#64748b;
+  font-size:12px;
+  margin-bottom:7px;
+}
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+.admin-info-name{
+  font-size:17px;
+  font-weight:bold;
+  margin-bottom:5px;
+}
 
-    /* =========================================================
-       ACCESS DENIED
-       ========================================================= */
+.admin-info-id{
+  color:#94a3b8;
+  font-size:13px;
+}
 
-    .access-denied {
-      display: none;
-      background: #111827;
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      border-radius: 18px;
-      padding: 30px 20px;
-      text-align: center;
-      margin-top: 20px;
-    }
+/* =========================================================
+   ADMIN CONTENT
+========================================================= */
 
-    .access-denied.visible {
-      display: block;
-    }
+#admin-content{
+  display:none;
+}
 
-    .access-denied-icon {
-      font-size: 52px;
-      margin-bottom: 15px;
-    }
+#admin-content.visible{
+  display:block;
+}
 
-    .access-denied h2 {
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
+/* =========================================================
+   DASHBOARD
+========================================================= */
 
-    .access-denied p {
-      color: #94a3b8;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
+.dashboard{
+  display:grid;
+  grid-template-columns:
+    repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-bottom:20px;
+}
 
-    /* =========================================================
-       RETRY BUTTON
-       ========================================================= */
+.stat-card{
+  background:#111827;
+  border:1px solid #1e293b;
+  border-radius:17px;
+  padding:17px;
+  min-height:110px;
+}
 
-    .retry-button {
-      display: none;
-      width: 100%;
-      border: 0;
-      border-radius: 12px;
-      padding: 13px 18px;
-      background: #2563eb;
-      color: white;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.stat-icon{
+  font-size:22px;
+  margin-bottom:12px;
+}
 
-    .retry-button.visible {
-      display: block;
-    }
+.stat-label{
+  color:#94a3b8;
+  font-size:12px;
+  margin-bottom:7px;
+}
 
-    .retry-button:active {
-      transform: scale(0.98);
-    }
+.stat-value{
+  font-size:23px;
+  font-weight:bold;
+}
 
-    /* =========================================================
-       ADMIN PANEL
-       ========================================================= */
+.stat-sub{
+  color:#64748b;
+  font-size:11px;
+  margin-top:5px;
+}
 
-    #admin-content {
-      display: none;
-    }
+/* =========================================================
+   PANELS
+========================================================= */
 
-    #admin-content.visible {
-      display: block;
-    }
+.panel{
+  background:#111827;
+  border:1px solid #1e293b;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:20px;
+}
 
-    /* =========================================================
-       SECURITY MESSAGE
-       ========================================================= */
+.panel-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:17px;
+}
 
-    .security-note {
-      margin-top: 15px;
-      color: #64748b;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-  </style>
+.panel h2{
+  font-size:19px;
+}
+
+.panel-description{
+  color:#94a3b8;
+  font-size:13px;
+  margin-top:5px;
+}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.filters{
+  display:grid;
+  grid-template-columns:
+    1.4fr .8fr auto;
+  gap:10px;
+  margin-bottom:17px;
+}
+
+.input,
+.select{
+  width:100%;
+  border:1px solid #334155;
+  background:#0b1220;
+  color:#fff;
+  border-radius:11px;
+  padding:12px;
+  outline:none;
+}
+
+.input:focus,
+.select:focus{
+  border-color:#3b82f6;
+}
+
+.filter-button{
+  border:0;
+  background:#2563eb;
+  color:#fff;
+  border-radius:11px;
+  padding:12px 17px;
+  font-weight:bold;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-wrapper{
+  width:100%;
+  overflow-x:auto;
+}
+
+.withdrawals-table{
+  width:100%;
+  min-width:980px;
+  border-collapse:collapse;
+}
+
+.withdrawals-table th{
+  text-align:left;
+  color:#64748b;
+  font-size:11px;
+  font-weight:bold;
+  text-transform:uppercase;
+  padding:12px;
+  border-bottom:1px solid #1e293b;
+}
+
+.withdrawals-table td{
+  padding:14px 12px;
+  border-bottom:1px solid #1e293b;
+  font-size:13px;
+  vertical-align:middle;
+}
+
+.withdrawals-table tr:hover{
+  background:#0f172a;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.badge.pending{
+  color:#fbbf24;
+  background:rgba(245,158,11,.12);
+}
+
+.badge.processing{
+  color:#60a5fa;
+  background:rgba(59,130,246,.12);
+}
+
+.badge.completed{
+  color:#4ade80;
+  background:rgba(34,197,94,.12);
+}
+
+.badge.rejected{
+  color:#f87171;
+  background:rgba(239,68,68,.12);
+}
+
+.badge.unknown{
+  color:#94a3b8;
+  background:#1e293b;
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.action-button{
+  border:0;
+  border-radius:9px;
+  padding:8px 10px;
+  color:#fff;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.action-button.approve{
+  background:#15803d;
+}
+
+.action-button.reject{
+  background:#b91c1c;
+}
+
+.action-button.process{
+  background:#1d4ed8;
+}
+
+.action-button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty{
+  display:none;
+  text-align:center;
+  padding:35px 15px;
+  color:#64748b;
+}
+
+.empty.visible{
+  display:block;
+}
+
+.empty-icon{
+  font-size:42px;
+  margin-bottom:10px;
+}
+
+/* =========================================================
+   ACCESS DENIED
+========================================================= */
+
+.access-denied{
+  display:none;
+  background:#111827;
+  border:1px solid rgba(239,68,68,.35);
+  border-radius:18px;
+  padding:30px 20px;
+  text-align:center;
+  margin-top:20px;
+}
+
+.access-denied.visible{
+  display:block;
+}
+
+.access-denied-icon{
+  font-size:52px;
+  margin-bottom:15px;
+}
+
+.access-denied h2{
+  font-size:22px;
+  margin-bottom:10px;
+}
+
+.access-denied p{
+  color:#94a3b8;
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:20px;
+}
+
+.retry-button{
+  display:none;
+  width:100%;
+  max-width:300px;
+  border:0;
+  border-radius:12px;
+  padding:13px 18px;
+  background:#2563eb;
+  color:#fff;
+  font-size:15px;
+  font-weight:bold;
+}
+
+.retry-button.visible{
+  display:inline-block;
+}
+
+/* =========================================================
+   SECURITY
+========================================================= */
+
+.security-note{
+  color:#64748b;
+  font-size:12px;
+  line-height:1.5;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:9999;
+}
+
+.modal-overlay.visible{
+  display:flex;
+}
+
+.modal{
+  width:100%;
+  max-width:430px;
+  background:#111827;
+  border:1px solid #334155;
+  border-radius:18px;
+  padding:22px;
+}
+
+.modal h3{
+  font-size:19px;
+  margin-bottom:10px;
+}
+
+.modal p{
+  color:#94a3b8;
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:20px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
+
+.modal-actions button{
+  flex:1;
+  border:0;
+  border-radius:11px;
+  padding:12px;
+  font-weight:bold;
+}
+
+.modal-cancel{
+  background:#1e293b;
+  color:#fff;
+}
+
+.modal-confirm{
+  background:#2563eb;
+  color:#fff;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translateX(-50%) translateY(100px);
+  opacity:0;
+  background:#020617;
+  border:1px solid #334155;
+  color:#fff;
+  padding:12px 17px;
+  border-radius:12px;
+  font-size:13px;
+  z-index:10000;
+  transition:.25s ease;
+  max-width:90%;
+  text-align:center;
+}
+
+.toast.visible{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:850px){
+
+  .dashboard{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+}
+
+@media(max-width:600px){
+
+  .app{
+    padding:15px;
+  }
+
+  .header-top{
+    align-items:flex-start;
+  }
+
+  .header h1{
+    font-size:23px;
+  }
+
+  .refresh-main{
+    padding:9px 11px;
+    font-size:12px;
+  }
+
+  .dashboard{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .stat-card{
+    min-height:100px;
+    padding:14px;
+  }
+
+  .stat-value{
+    font-size:20px;
+  }
+
+  .filters{
+    grid-template-columns:1fr;
+  }
+
+  .panel{
+    padding:15px;
+  }
+
+}
+
+</style>
+
 </head>
 
 <body>
 
-  <main class="app">
+<main class="app">
 
-    <!-- =======================================================
-         HEADER
-         ======================================================= -->
+<!-- =======================================================
+     HEADER
+======================================================= -->
 
-    <header class="header">
+<header class="header">
+
+  <div class="header-top">
+
+    <div>
+
       <h1>🛡️ CryptoMine Admin</h1>
-      <p>Panel administrativo seguro</p>
-    </header>
 
+      <p>
+        Panel administrativo seguro
+      </p>
 
-    <!-- =======================================================
-         CONNECTION STATUS
-         ======================================================= -->
+    </div>
 
-    <section
-      id="status-box"
-      class="status"
+    <button
+      id="refresh-main"
+      class="refresh-main"
+      type="button"
     >
-      Estado:
-      <span id="status-text">
-        Conectando...
-      </span>
+      🔄 Actualizar
+    </button>
+
+  </div>
+
+</header>
+
+
+<!-- =======================================================
+     STATUS
+======================================================= -->
+
+<section
+  id="status-box"
+  class="status"
+>
+
+  Estado:
+  <span id="status-text">
+    Conectando...
+  </span>
+
+  <div
+    id="loading-indicator"
+    class="loading"
+  >
+
+    <div class="spinner"></div>
+
+    <span>
+      Verificando administrador...
+    </span>
+
+  </div>
+
+</section>
+
+
+<!-- =======================================================
+     ADMIN INFO
+======================================================= -->
+
+<section
+  id="admin-info"
+  class="admin-info"
+>
+
+  <div class="admin-info-title">
+    Administrador autenticado
+  </div>
+
+  <div
+    id="admin-name"
+    class="admin-info-name"
+  >
+    —
+  </div>
+
+  <div
+    id="admin-id"
+    class="admin-info-id"
+  >
+    Telegram ID: —
+  </div>
+
+</section>
+
+
+<!-- =======================================================
+     ADMIN CONTENT
+======================================================= -->
+
+<div id="admin-content">
+
+
+  <!-- =====================================================
+       ESTADÍSTICAS
+  ====================================================== -->
+
+  <section class="dashboard">
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        💰
+      </div>
+
+      <div class="stat-label">
+        TOTAL RETIROS
+      </div>
 
       <div
-        id="loading-indicator"
-        class="loading"
+        id="stat-total"
+        class="stat-value"
       >
-        <div class="spinner"></div>
-        <span>Verificando administrador...</span>
+        0
       </div>
-    </section>
-
-
-    <!-- =======================================================
-         ADMIN INFORMATION
-         ======================================================= -->
-
-    <section
-      id="admin-info"
-      class="admin-info"
-    >
-      <div class="admin-info-title">
-        Administrador autenticado
-      </div>
-
-      <div
-        id="admin-name"
-        class="admin-info-name"
-      >
-        —
-      </div>
-
-      <div
-        id="admin-id"
-        class="admin-info-id"
-      >
-        Telegram ID: —
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         ADMIN CONTENT
-         ======================================================= -->
-
-    <div id="admin-content">
-
-      <section class="panel">
-
-        <h2>💰 Gestión de retiros</h2>
-
-        <p>
-          Este panel permitirá revisar y autorizar
-          retiros de CryptoMine.
-        </p>
-
-        <p class="security-note">
-          🔐 Las operaciones administrativas serán
-          ejecutadas mediante Edge Functions protegidas
-          en el servidor.
-        </p>
-
-      </section>
 
     </div>
 
 
-    <!-- =======================================================
-         ACCESS DENIED
-         ======================================================= -->
+    <div class="stat-card">
 
-    <section
-      id="access-denied"
-      class="access-denied"
-    >
-
-      <div class="access-denied-icon">
-        🛡️
+      <div class="stat-icon">
+        ⏳
       </div>
 
-      <h2>
-        Acceso denegado
-      </h2>
+      <div class="stat-label">
+        PENDIENTES
+      </div>
 
-      <p>
-        Esta aplicación está restringida
-        al administrador autorizado.
-      </p>
+      <div
+        id="stat-pending"
+        class="stat-value"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        ⚙️
+      </div>
+
+      <div class="stat-label">
+        PROCESANDO
+      </div>
+
+      <div
+        id="stat-processing"
+        class="stat-value"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        ✅
+      </div>
+
+      <div class="stat-label">
+        COMPLETADOS
+      </div>
+
+      <div
+        id="stat-completed"
+        class="stat-value"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        ❌
+      </div>
+
+      <div class="stat-label">
+        RECHAZADOS
+      </div>
+
+      <div
+        id="stat-rejected"
+        class="stat-value"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        💸
+      </div>
+
+      <div class="stat-label">
+        PENDIENTE TRX
+      </div>
+
+      <div
+        id="stat-pending-amount"
+        class="stat-value"
+      >
+        0
+      </div>
+
+      <div class="stat-sub">
+        TRX
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        🏦
+      </div>
+
+      <div class="stat-label">
+        COMPLETADO TRX
+      </div>
+
+      <div
+        id="stat-completed-amount"
+        class="stat-value"
+      >
+        0
+      </div>
+
+      <div class="stat-sub">
+        TRX
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        📊
+      </div>
+
+      <div class="stat-label">
+        TASA COMPLETADA
+      </div>
+
+      <div
+        id="stat-success-rate"
+        class="stat-value"
+      >
+        0%
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       RETIROS
+  ====================================================== -->
+
+  <section class="panel">
+
+    <div class="panel-header">
+
+      <div>
+
+        <h2>
+          💰 Gestión de retiros
+        </h2>
+
+        <p class="panel-description">
+          Revisión y administración de solicitudes
+          de retiro de CryptoMine.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         FILTERS
+    ==================================================== -->
+
+    <div class="filters">
+
+      <input
+        id="search-input"
+        class="input"
+        type="text"
+        placeholder="Buscar ID, Telegram ID o dirección..."
+      >
+
+      <select
+        id="status-filter"
+        class="select"
+      >
+
+        <option value="all">
+          Todos los estados
+        </option>
+
+        <option value="pending">
+          Pendientes
+        </option>
+
+        <option value="processing">
+          Procesando
+        </option>
+
+        <option value="completed">
+          Completados
+        </option>
+
+        <option value="rejected">
+          Rechazados
+        </option>
+
+      </select>
 
       <button
-        id="retry-button"
-        class="retry-button"
+        id="filter-button"
+        class="filter-button"
         type="button"
       >
-        🔄 Reintentar autenticación
+        🔎 Buscar
       </button>
 
-    </section>
-
-  </main>
+    </div>
 
 
-  <script>
-    "use strict";
+    <!-- ===================================================
+         TABLE
+    ==================================================== -->
 
-    const SUPABASE_URL =
-      "https://qszncidydwzyunbckjvm.supabase.co";
+    <div class="table-wrapper">
 
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_7K3lK77rwFpunFrW_9TK0Q_Tu-bcgv9";
+      <table class="withdrawals-table">
 
+        <thead>
 
-    /* =========================================================
-       EDGE FUNCTION
-       ========================================================= */
+          <tr>
 
-    const ADMIN_AUTH_URL =
-      `${SUPABASE_URL}/functions/v1/admin-auth`;
+            <th>
+              ID
+            </th>
 
+            <th>
+              Usuario
+            </th>
 
-    /* =========================================================
-       TELEGRAM
-       ========================================================= */
+            <th>
+              Método
+            </th>
 
-    const tg =
-      window.Telegram?.WebApp;
+            <th>
+              Destino
+            </th>
 
+            <th>
+              Monto
+            </th>
 
-    /* =========================================================
-       DOM
-       ========================================================= */
+            <th>
+              Estado
+            </th>
 
-    const statusBox =
-      document.getElementById("status-box");
+            <th>
+              Fecha
+            </th>
 
-    const statusText =
-      document.getElementById("status-text");
+            <th>
+              Acciones
+            </th>
 
-    const loadingIndicator =
-      document.getElementById("loading-indicator");
+          </tr>
 
-    const adminInfo =
-      document.getElementById("admin-info");
+        </thead>
 
-    const adminName =
-      document.getElementById("admin-name");
+        <tbody id="withdrawals-body">
+        </tbody>
 
-    const adminId =
-      document.getElementById("admin-id");
+      </table>
 
-    const adminContent =
-      document.getElementById("admin-content");
-
-    const accessDenied =
-      document.getElementById("access-denied");
-
-    const retryButton =
-      document.getElementById("retry-button");
+    </div>
 
 
-    /* =========================================================
-       ESTADO LOCAL
-       ========================================================= */
+    <div
+      id="empty-state"
+      class="empty"
+    >
 
-    const AdminState = {
-      authenticated: false,
-      user: null,
-      authDate: null
-    };
+      <div class="empty-icon">
+        📭
+      </div>
+
+      <div>
+        No hay retiros para mostrar.
+      </div>
+
+    </div>
 
 
-    /* =========================================================
-       TELEGRAM INITIALIZATION
-       ========================================================= */
+    <div class="security-note">
 
-    function initializeTelegram() {
+      🔐 Las operaciones administrativas se ejecutan
+      exclusivamente mediante Edge Functions protegidas
+      en el servidor.
 
-      if (!tg) {
+    </div>
 
-        console.error(
-          "❌ Telegram WebApp SDK no está disponible."
+  </section>
+
+</div>
+
+
+<!-- =======================================================
+     ACCESS DENIED
+======================================================= -->
+
+<section
+  id="access-denied"
+  class="access-denied"
+>
+
+  <div class="access-denied-icon">
+    🛡️
+  </div>
+
+  <h2>
+    Acceso denegado
+  </h2>
+
+  <p>
+    Esta aplicación está restringida
+    al administrador autorizado.
+  </p>
+
+  <button
+    id="retry-button"
+    class="retry-button"
+    type="button"
+  >
+    🔄 Reintentar autenticación
+  </button>
+
+</section>
+
+</main>
+
+
+<!-- =======================================================
+     CONFIRM MODAL
+======================================================= -->
+
+<div
+  id="modal-overlay"
+  class="modal-overlay"
+>
+
+  <div class="modal">
+
+    <h3 id="modal-title">
+      Confirmar operación
+    </h3>
+
+    <p id="modal-message">
+      ¿Deseas continuar?
+    </p>
+
+    <div class="modal-actions">
+
+      <button
+        id="modal-cancel"
+        class="modal-cancel"
+        type="button"
+      >
+        Cancelar
+      </button>
+
+      <button
+        id="modal-confirm"
+        class="modal-confirm"
+        type="button"
+      >
+        Confirmar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =======================================================
+     TOAST
+======================================================= -->
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+<script>
+
+"use strict";
+
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+  "https://qszncidydwzyunbckjvm.supabase.co";
+
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_7K3lK77rwFpunFrW_9TK0Q_Tu-bcgv9";
+
+
+/* =========================================================
+   EDGE FUNCTIONS
+========================================================= */
+
+const ADMIN_AUTH_URL =
+  `${SUPABASE_URL}/functions/v1/admin-auth`;
+
+
+const APPROVE_WITHDRAWAL_URL =
+  `${SUPABASE_URL}/functions/v1/approve-withdrawal-admin`;
+
+
+const REJECT_WITHDRAWAL_URL =
+  `${SUPABASE_URL}/functions/v1/reject-withdrawal-admin`;
+
+
+const PROCESS_WITHDRAWAL_URL =
+  `${SUPABASE_URL}/functions/v1/process-withdrawals-v2`;
+
+
+/*
+ * IMPORTANTE:
+ *
+ * Esta función de lectura deberá existir en Supabase.
+ *
+ * No usamos directamente:
+ *
+ * supabase.from("withdrawals").select(...)
+ *
+ * desde el navegador.
+ *
+ * La lectura administrativa también debe pasar
+ * por una Edge Function protegida.
+ */
+
+const ADMIN_WITHDRAWALS_URL =
+  `${SUPABASE_URL}/functions/v1/admin-withdrawals`;
+
+
+/* =========================================================
+   TELEGRAM
+========================================================= */
+
+const tg =
+  window.Telegram?.WebApp;
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const statusBox =
+  document.getElementById("status-box");
+
+const statusText =
+  document.getElementById("status-text");
+
+const loadingIndicator =
+  document.getElementById("loading-indicator");
+
+const adminInfo =
+  document.getElementById("admin-info");
+
+const adminName =
+  document.getElementById("admin-name");
+
+const adminId =
+  document.getElementById("admin-id");
+
+const adminContent =
+  document.getElementById("admin-content");
+
+const accessDenied =
+  document.getElementById("access-denied");
+
+const retryButton =
+  document.getElementById("retry-button");
+
+const refreshMain =
+  document.getElementById("refresh-main");
+
+const withdrawalsBody =
+  document.getElementById("withdrawals-body");
+
+const emptyState =
+  document.getElementById("empty-state");
+
+const searchInput =
+  document.getElementById("search-input");
+
+const statusFilter =
+  document.getElementById("status-filter");
+
+const filterButton =
+  document.getElementById("filter-button");
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+const modalOverlay =
+  document.getElementById("modal-overlay");
+
+const modalTitle =
+  document.getElementById("modal-title");
+
+const modalMessage =
+  document.getElementById("modal-message");
+
+const modalCancel =
+  document.getElementById("modal-cancel");
+
+const modalConfirm =
+  document.getElementById("modal-confirm");
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+const toast =
+  document.getElementById("toast");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+const AdminState = {
+
+  authenticated:false,
+
+  user:null,
+
+  authDate:null,
+
+  withdrawals:[],
+
+  filteredWithdrawals:[],
+
+  loadingWithdrawals:false,
+
+  activeOperation:null
+
+};
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function setLoading(
+  message="Verificando administrador..."
+){
+
+  statusBox.classList.remove(
+    "success",
+    "error"
+  );
+
+  statusText.textContent =
+    "Conectando...";
+
+  loadingIndicator.style.display =
+    "flex";
+
+  loadingIndicator
+    .querySelector("span")
+    .textContent =
+      message;
+}
+
+
+function setSuccess(
+  message="Administrador autenticado"
+){
+
+  statusBox.classList.remove(
+    "error"
+  );
+
+  statusBox.classList.add(
+    "success"
+  );
+
+  statusText.textContent =
+    message;
+
+  loadingIndicator.style.display =
+    "none";
+}
+
+
+function setError(
+  message="Acceso denegado"
+){
+
+  statusBox.classList.remove(
+    "success"
+  );
+
+  statusBox.classList.add(
+    "error"
+  );
+
+  statusText.textContent =
+    message;
+
+  loadingIndicator.style.display =
+    "none";
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer = null;
+
+
+function showToast(message){
+
+  toast.textContent =
+    message;
+
+  toast.classList.add(
+    "visible"
+  );
+
+  clearTimeout(
+    toastTimer
+  );
+
+  toastTimer =
+    setTimeout(
+      () => {
+
+        toast.classList.remove(
+          "visible"
         );
 
-        setError(
-          "Telegram no está disponible"
-        );
+      },
+      3000
+    );
+}
 
-        showAccessDenied();
 
-        return false;
-      }
+/* =========================================================
+   TELEGRAM
+========================================================= */
 
-      try {
+function initializeTelegram(){
 
-        tg.ready();
+  if(!tg){
 
-        tg.expand();
-
-        console.log(
-          "✅ Telegram WebApp inicializado"
-        );
-
-        console.log(
-          "Telegram initData disponible:",
-          Boolean(tg.initData)
-        );
-
-        return true;
-
-      } catch (error) {
-
-        console.error(
-          "❌ Error inicializando Telegram:",
-          error
-        );
-
-        setError(
-          "Error inicializando Telegram"
-        );
-
-        showAccessDenied();
-
-        return false;
-      }
-    }
-
-
-    /* =========================================================
-       STATUS HELPERS
-       ========================================================= */
-
-    function setLoading(message = "Verificando administrador...") {
-
-      statusBox.classList.remove(
-        "success",
-        "error"
-      );
-
-      statusText.textContent =
-        "Conectando...";
-
-      loadingIndicator.style.display =
-        "flex";
-
-      loadingIndicator.querySelector("span")
-        .textContent = message;
-    }
-
-
-    function setSuccess(message = "Administrador autenticado") {
-
-      statusBox.classList.remove(
-        "error"
-      );
-
-      statusBox.classList.add(
-        "success"
-      );
-
-      statusText.textContent =
-        message;
-
-      loadingIndicator.style.display =
-        "none";
-    }
-
-
-    function setError(message = "Acceso denegado") {
-
-      statusBox.classList.remove(
-        "success"
-      );
-
-      statusBox.classList.add(
-        "error"
-      );
-
-      statusText.textContent =
-        message;
-
-      loadingIndicator.style.display =
-        "none";
-    }
-
-
-    /* =========================================================
-       SHOW ADMIN PANEL
-       ========================================================= */
-
-    function showAdminPanel() {
-
-      accessDenied.classList.remove(
-        "visible"
-      );
-
-      retryButton.classList.remove(
-        "visible"
-      );
-
-      adminContent.classList.add(
-        "visible"
-      );
-
-      adminInfo.classList.add(
-        "visible"
-      );
-    }
-
-
-    /* =========================================================
-       SHOW ACCESS DENIED
-       ========================================================= */
-
-    function showAccessDenied() {
-
-      AdminState.authenticated =
-        false;
-
-      AdminState.user =
-        null;
-
-      AdminState.authDate =
-        null;
-
-      adminContent.classList.remove(
-        "visible"
-      );
-
-      adminInfo.classList.remove(
-        "visible"
-      );
-
-      accessDenied.classList.add(
-        "visible"
-      );
-
-      retryButton.classList.add(
-        "visible"
-      );
-    }
-
-
-    /* =========================================================
-       HIDE ACCESS DENIED
-       ========================================================= */
-
-    function hideAccessDenied() {
-
-      accessDenied.classList.remove(
-        "visible"
-      );
-
-      retryButton.classList.remove(
-        "visible"
-      );
-    }
-
-
-    /* =========================================================
-       UPDATE ADMIN INFORMATION
-       ========================================================= */
-
-    function updateAdminInformation(user) {
-
-      if (!user) {
-        return;
-      }
-
-      const firstName =
-        user.first_name || "";
-
-      const lastName =
-        user.last_name || "";
-
-      const username =
-        user.username
-          ? `@${user.username}`
-          : "";
-
-      const fullName =
-        `${firstName} ${lastName}`.trim();
-
-      adminName.textContent =
-        fullName ||
-        username ||
-        "Administrador";
-
-      adminId.textContent =
-        `Telegram ID: ${user.id}`;
-
-      if (username) {
-
-        adminName.textContent =
-          fullName
-            ? `${fullName} (${username})`
-            : username;
-      }
-    }
-
-
-    /* =========================================================
-       ADMIN AUTHENTICATION
-       ========================================================= */
-
-    async function authenticateAdmin() {
-
-      console.log(
-        "🔐 Iniciando autenticación administrativa..."
-      );
-
-      hideAccessDenied();
-
-      adminContent.classList.remove(
-        "visible"
-      );
-
-      adminInfo.classList.remove(
-        "visible"
-      );
-
-      setLoading(
-        "Verificando identidad de Telegram..."
-      );
-
-
-      /* -------------------------------------------------------
-         Verificar Telegram
-         ------------------------------------------------------- */
-
-      if (!tg) {
-
-        setError(
-          "Telegram no está disponible"
-        );
-
-        showAccessDenied();
-
-        return false;
-      }
-
-
-      /* -------------------------------------------------------
-         Obtener initData
-         ------------------------------------------------------- */
-
-      const initData =
-        tg.initData;
-
-
-      if (
-        !initData ||
-        typeof initData !== "string" ||
-        initData.trim() === ""
-      ) {
-
-        console.error(
-          "❌ Telegram initData vacío."
-        );
-
-        setError(
-          "Sesión de Telegram no disponible"
-        );
-
-        showAccessDenied();
-
-        return false;
-      }
-
-
-      console.log(
-        "✅ Telegram initData recibido."
-      );
-
-
-      /* -------------------------------------------------------
-         Validar configuración frontend
-         ------------------------------------------------------- */
-
-      if (
-        !SUPABASE_URL ||
-        SUPABASE_URL.includes("TU_PROJECT_REF")
-      ) {
-
-        console.error(
-          "❌ SUPABASE_URL no configurada."
-        );
-
-        setError(
-          "Configuración incompleta"
-        );
-
-        showAccessDenied();
-
-        return false;
-      }
-
-
-      if (
-        !SUPABASE_ANON_KEY ||
-        SUPABASE_ANON_KEY.includes("TU_SUPABASE_ANON_KEY")
-      ) {
-
-        console.error(
-          "❌ SUPABASE_ANON_KEY no configurada."
-        );
-
-        setError(
-          "Configuración incompleta"
-        );
-
-        showAccessDenied();
-
-        return false;
-      }
-
-
-      /* -------------------------------------------------------
-         Timeout de seguridad
-         ------------------------------------------------------- */
-
-      const controller =
-        new AbortController();
-
-      const timeoutId =
-        setTimeout(
-          () => controller.abort(),
-          15000
-        );
-
-
-      try {
-
-        /* -----------------------------------------------------
-           Petición a admin-auth
-           ----------------------------------------------------- */
-
-        const response =
-          await fetch(
-            ADMIN_AUTH_URL,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-
-                "apikey":
-                  SUPABASE_ANON_KEY },
-
-              body: JSON.stringify({
-                initData
-              }),
-
-              signal:
-                controller.signal
-            }
-          );
-
-
-        clearTimeout(
-          timeoutId
-        );
-
-
-        /* -----------------------------------------------------
-           Leer respuesta
-           ----------------------------------------------------- */
-
-        let result;
-
-        try {
-
-          result =
-            await response.json();
-
-        } catch {
-
-          throw new Error(
-            "Respuesta inválida del servidor."
-          );
-        }
-
-
-        console.log(
-          "🔐 Respuesta admin-auth:",
-          result
-        );
-
-
-        /* -----------------------------------------------------
-           HTTP no exitoso
-           ----------------------------------------------------- */
-
-        if (!response.ok) {
-
-          if (
-            response.status === 403
-          ) {
-
-            throw new Error(
-              "Access denied"
-            );
-          }
-
-          if (
-            response.status === 401
-          ) {
-
-            throw new Error(
-              "Invalid or expired initData"
-            );
-          }
-
-          throw new Error(
-            result?.error ||
-            "Error de autenticación."
-          );
-        }
-
-
-        /* -----------------------------------------------------
-           Respuesta inesperada
-           ----------------------------------------------------- */
-
-        if (
-          !result ||
-          result.success !== true ||
-          result.authorized !== true
-        ) {
-
-          throw new Error(
-            "Access denied"
-          );
-        }
-
-
-        /* -----------------------------------------------------
-           AUTENTICACIÓN CORRECTA
-           ----------------------------------------------------- */
-
-        AdminState.authenticated =
-          true;
-
-        AdminState.user =
-          result.user || null;
-
-        AdminState.authDate =
-          result.authDate || null;
-
-
-        console.log(
-          "===================================="
-        );
-
-        console.log(
-          "✅ ADMINISTRADOR AUTENTICADO"
-        );
-
-        console.log(
-          "Telegram ID:",
-          result.user?.id
-        );
-
-        console.log(
-          "===================================="
-        );
-
-
-        updateAdminInformation(
-          result.user
-        );
-
-
-        setSuccess(
-          "Administrador autenticado"
-        );
-
-
-        showAdminPanel();
-
-
-        return true;
-
-
-      } catch (error) {
-
-        clearTimeout(
-          timeoutId
-        );
-
-
-        console.error(
-          "❌ Error durante admin-auth:",
-          error
-        );
-
-
-        AdminState.authenticated =
-          false;
-
-
-        /* -----------------------------------------------------
-           Mensajes seguros para el usuario
-           ----------------------------------------------------- */
-
-        if (
-          error?.name ===
-          "AbortError"
-        ) {
-
-          setError(
-            "Tiempo de espera agotado"
-          );
-
-        } else if (
-          error?.message ===
-          "Access denied"
-        ) {
-
-          setError(
-            "Acceso denegado"
-          );
-
-        } else if (
-          error?.message ===
-          "Invalid or expired initData"
-        ) {
-
-          setError(
-            "Sesión de Telegram inválida"
-          );
-
-        } else {
-
-          setError(
-            "No se pudo verificar el acceso"
-          );
-        }
-
-
-        showAccessDenied();
-
-        return false;
-      }
-    }
-
-
-    /* =========================================================
-       RETRY
-       ========================================================= */
-
-    retryButton.addEventListener(
-      "click",
-      async () => {
-
-        console.log(
-          "🔄 Reintentando autenticación..."
-        );
-
-        await authenticateAdmin();
-      }
+    console.error(
+      "❌ Telegram WebApp SDK no está disponible."
     );
 
-
-    /* =========================================================
-       START
-       ========================================================= */
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      async () => {
-
-        console.log(
-          "🚀 CryptoMine Admin iniciando..."
-        );
-
-        const telegramReady =
-          initializeTelegram();
-
-        if (!telegramReady) {
-          return;
-        }
-
-        await authenticateAdmin();
-      }
+    setError(
+      "Telegram no está disponible"
     );
 
+    showAccessDenied();
 
-    /* =========================================================
-       FUNCIONES ADMINISTRATIVAS
-       =========================================================
+    return false;
+  }
 
-       Estas funciones se conectarán en el siguiente paso:
+  try{
 
-       approveWithdrawal()
-       rejectWithdrawal()
+    tg.ready();
 
-       IMPORTANTE:
+    tg.expand();
 
-       No ejecutaremos estas operaciones directamente
-       desde Supabase usando una RPC pública.
-
-       El flujo será:
-
-       CryptoMine Admin
-              ↓
-       Telegram initData
-              ↓
-       approve-withdrawal-admin
-              ↓
-       validar ADMIN_BOT_TOKEN
-              ↓
-       validar ADMIN_TELEGRAM_ID
-              ↓
-       ejecutar operación
-              ↓
-       misma base de datos CryptoMine TMA
-
-       ========================================================= */
-
-
-    async function approveWithdrawal(withdrawalId) {
-
-      if (!AdminState.authenticated) {
-
-        console.error(
-          "❌ Operación bloqueada: administrador no autenticado."
-        );
-
-        return;
-      }
-
-      console.log(
-        "Aprobar retiro:",
-        withdrawalId
-      );
-
-      /*
-       * NO implementamos todavía el fetch aquí porque
-       * necesitamos utilizar exactamente el formato que
-       * espera tu Edge Function approve-withdrawal-admin.
-       *
-       * Cuando me pases esa función, conectaremos aquí:
-       *
-       * POST /functions/v1/approve-withdrawal-admin
-       *
-       * enviando el initData y el withdrawal_id
-       * según su contrato real.
-       */
-    }
-
-
-    async function rejectWithdrawal(withdrawalId) {
-
-      if (!AdminState.authenticated) {
-
-        console.error(
-          "❌ Operación bloqueada: administrador no autenticado."
-        );
-
-        return;
-      }
-
-      console.log(
-        "Rechazar retiro:",
-        withdrawalId
-      );
-    }
     console.log(
-      "CryptoMine Admin frontend cargado."
+      "✅ Telegram WebApp inicializado"
     );
 
-  </script>
+    console.log(
+      "Telegram initData disponible:",
+      Boolean(tg.initData)
+    );
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "❌ Error inicializando Telegram:",
+      error
+    );
+
+    setError(
+      "Error inicializando Telegram"
+    );
+
+    showAccessDenied();
+
+    return false;
+  }
+}
+
+
+/* =========================================================
+   ACCESS
+========================================================= */
+
+function showAdminPanel(){
+
+  accessDenied.classList.remove(
+    "visible"
+  );
+
+  retryButton.classList.remove(
+    "visible"
+  );
+
+  adminContent.classList.add(
+    "visible"
+  );
+
+  adminInfo.classList.add(
+    "visible"
+  );
+}
+
+
+function showAccessDenied(){
+
+  AdminState.authenticated =
+    false;
+
+  AdminState.user =
+    null;
+
+  AdminState.authDate =
+    null;
+
+  adminContent.classList.remove(
+    "visible"
+  );
+
+  adminInfo.classList.remove(
+    "visible"
+  );
+
+  accessDenied.classList.add(
+    "visible"
+  );
+
+  retryButton.classList.add(
+    "visible"
+  );
+}
+
+
+function hideAccessDenied(){
+
+  accessDenied.classList.remove(
+    "visible"
+  );
+
+  retryButton.classList.remove(
+    "visible"
+  );
+}
+
+
+/* =========================================================
+   ADMIN INFORMATION
+========================================================= */
+
+function updateAdminInformation(user){
+
+  if(!user){
+    return;
+  }
+
+  const firstName =
+    user.first_name || "";
+
+  const lastName =
+    user.last_name || "";
+
+  const username =
+    user.username
+      ? `@${user.username}`
+      : "";
+
+  const fullName =
+    `${firstName} ${lastName}`.trim();
+
+  adminName.textContent =
+    fullName ||
+    username ||
+    "Administrador";
+
+  if(username){
+
+    adminName.textContent =
+      fullName
+        ? `${fullName} (${username})`
+        : username;
+  }
+
+  adminId.textContent =
+    `Telegram ID: ${user.id}`;
+}
+
+
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
+
+async function authenticateAdmin(){
+
+  console.log(
+    "🔐 Iniciando autenticación administrativa..."
+  );
+
+  hideAccessDenied();
+
+  adminContent.classList.remove(
+    "visible"
+  );
+
+  adminInfo.classList.remove(
+    "visible"
+  );
+
+  setLoading(
+    "Verificando identidad de Telegram..."
+  );
+
+
+  if(!tg){
+
+    setError(
+      "Telegram no está disponible"
+    );
+
+    showAccessDenied();
+
+    return false;
+  }
+
+
+  const initData =
+    tg.initData;
+
+
+  if(
+    !initData ||
+    typeof initData !== "string" ||
+    initData.trim() === ""
+  ){
+
+    console.error(
+      "❌ Telegram initData vacío."
+    );
+
+    setError(
+      "Sesión de Telegram no disponible"
+    );
+
+    showAccessDenied();
+
+    return false;
+  }
+
+
+  console.log(
+    "✅ Telegram initData recibido."
+  );
+
+
+  if(
+    !SUPABASE_URL ||
+    !SUPABASE_ANON_KEY
+  ){
+
+    setError(
+      "Configuración incompleta"
+    );
+
+    showAccessDenied();
+
+    return false;
+  }
+
+
+  const controller =
+    new AbortController();
+
+
+  const timeoutId =
+    setTimeout(
+      () => controller.abort(),
+      15000
+    );
+
+
+  try{
+
+    const response =
+      await fetch(
+        ADMIN_AUTH_URL,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "apikey":
+              SUPABASE_ANON_KEY
+          },
+
+          body:JSON.stringify({
+            initData
+          }),
+
+          signal:controller.signal
+        }
+      );
+
+
+    clearTimeout(
+      timeoutId
+    );
+
+
+    let result;
+
+
+    try{
+
+      result =
+        await response.json();
+
+    }catch{
+
+      throw new Error(
+        "Respuesta inválida del servidor."
+      );
+
+    }
+
+
+    console.log(
+      "🔐 Respuesta admin-auth:",
+      result
+    );
+
+
+    if(!response.ok){
+
+      if(response.status === 403){
+
+        throw new Error(
+          "Access denied"
+        );
+      }
+
+      if(response.status === 401){
+
+        throw new Error(
+          "Invalid or expired initData"
+        );
+      }
+
+      throw new Error(
+        result?.error ||
+        "Error de autenticación."
+      );
+    }
+
+
+    if(
+      !result ||
+      result.success !== true ||
+      result.authorized !== true
+    ){
+
+      throw new Error(
+        "Access denied"
+      );
+    }
+
+
+    AdminState.authenticated =
+      true;
+
+    AdminState.user =
+      result.user || null;
+
+    AdminState.authDate =
+      result.authDate || null;
+
+
+    console.log(
+      "===================================="
+    );
+
+    console.log(
+      "✅ ADMINISTRADOR AUTENTICADO"
+    );
+
+    console.log(
+      "Telegram ID:",
+      result.user?.id
+    );
+
+    console.log(
+      "===================================="
+    );
+
+
+    updateAdminInformation(
+      result.user
+    );
+
+
+    setSuccess(
+      "Administrador autenticado"
+    );
+
+
+    showAdminPanel();
+
+
+    await loadWithdrawals();
+
+
+    return true;
+
+
+  }catch(error){
+
+    clearTimeout(
+      timeoutId
+    );
+
+    console.error(
+      "❌ Error durante admin-auth:",
+      error
+    );
+
+
+    AdminState.authenticated =
+      false;
+
+
+    if(
+      error?.name ===
+      "AbortError"
+    ){
+
+      setError(
+        "Tiempo de espera agotado"
+      );
+
+    }else if(
+      error?.message ===
+      "Access denied"
+    ){
+
+      setError(
+        "Acceso denegado"
+      );
+
+    }else if(
+      error?.message ===
+      "Invalid or expired initData"
+    ){
+
+      setError(
+        "Sesión de Telegram inválida"
+      );
+
+    }else{
+
+      setError(
+        "No se pudo verificar el acceso"
+      );
+    }
+
+
+    showAccessDenied();
+
+    return false;
+  }
+}
+
+
+/* =========================================================
+   COMMON EDGE REQUEST
+========================================================= */
+
+async function adminEdgeRequest(
+  url,
+  payload
+){
+
+  if(!AdminState.authenticated){
+
+    throw new Error(
+      "Administrador no autenticado."
+    );
+  }
+
+
+  const initData =
+    tg?.initData;
+
+
+  if(!initData){
+
+    throw new Error(
+      "Telegram initData no disponible."
+    );
+  }
+
+
+  const response =
+    await fetch(
+      url,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json",
+
+          "apikey":
+            SUPABASE_ANON_KEY
+        },
+
+        body:JSON.stringify({
+          initData,
+          ...payload
+        })
+      }
+    );
+
+
+  let result;
+
+
+  try{
+
+    result =
+      await response.json();
+
+  }catch{
+
+    throw new Error(
+      "Respuesta inválida del servidor."
+    );
+  }
+
+
+  console.log(
+    "ADMIN EDGE RESPONSE:",
+    response.status,
+    result
+  );
+
+
+  if(!response.ok){
+
+    throw new Error(
+      result?.message ||
+      result?.error ||
+      `HTTP ${response.status}`
+    );
+  }
+
+
+  return result;
+}
+
+
+/* =========================================================
+   LOAD WITHDRAWALS
+========================================================= */
+
+async function loadWithdrawals(){
+
+  if(!AdminState.authenticated){
+    return;
+  }
+
+
+  if(AdminState.loadingWithdrawals){
+    return;
+  }
+
+
+  AdminState.loadingWithdrawals =
+    true;
+
+
+  try{
+
+    console.log(
+      "📥 Cargando retiros administrativos..."
+    );
+
+
+    /*
+     * El contrato esperado de admin-withdrawals
+     * es:
+     *
+     * {
+     *   success:true,
+     *   withdrawals:[...]
+     * }
+     *
+     * La Edge Function debe validar initData,
+     * ADMIN_BOT_TOKEN y ADMIN_TELEGRAM_ID
+     * en servidor.
+     */
+
+    const result =
+      await adminEdgeRequest(
+        ADMIN_WITHDRAWALS_URL,
+        {}
+      );
+
+
+    if(
+      !result ||
+      result.success !== true
+    ){
+
+      throw new Error(
+        result?.message ||
+        "No fue posible cargar los retiros."
+      );
+    }
+
+
+    AdminState.withdrawals =
+      Array.isArray(result.withdrawals)
+        ? result.withdrawals
+        : [];
+
+
+    console.log(
+      `✅ Retiros cargados: ${AdminState.withdrawals.length}`
+    );
+
+
+    applyFilters();
+
+
+  }catch(error){
+
+    console.error(
+      "❌ Error cargando retiros:",
+      error
+    );
+
+
+    showToast(
+      `Error cargando retiros: ${error.message}`
+    );
+
+
+    renderWithdrawals([]);
+
+
+  }finally{
+
+    AdminState.loadingWithdrawals =
+      false;
+  }
+}
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+function applyFilters(){
+
+  const search =
+    searchInput.value
+      .trim()
+      .toLowerCase();
+
+
+  const selectedStatus =
+    statusFilter.value;
+
+
+  AdminState.filteredWithdrawals =
+    AdminState.withdrawals.filter(
+      withdrawal => {
+
+        const status =
+          String(
+            withdrawal.status || ""
+          ).toLowerCase();
+
+
+        const searchable =
+          [
+            withdrawal.id,
+            withdrawal.telegram_id,
+            withdrawal.address,
+            withdrawal.method,
+            withdrawal.amount
+          ]
+          .join(" ")
+          .toLowerCase();
+
+
+        const matchesSearch =
+          !search ||
+          searchable.includes(search);
+
+
+        const matchesStatus =
+          selectedStatus === "all" ||
+          status === selectedStatus;
+
+
+        return (
+          matchesSearch &&
+          matchesStatus
+        );
+      }
+    );
+
+
+  renderWithdrawals(
+    AdminState.filteredWithdrawals
+  );
+
+
+  updateStatistics(
+    AdminState.withdrawals
+  );
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderWithdrawals(
+  withdrawals
+){
+
+  withdrawalsBody.innerHTML = "";
+
+
+  if(
+    !Array.isArray(withdrawals) ||
+    withdrawals.length === 0
+  ){
+
+    emptyState.classList.add(
+      "visible"
+    );
+
+    return;
+
+  }
+
+
+  emptyState.classList.remove(
+    "visible"
+  );
+
+
+  withdrawals.forEach(
+    withdrawal => {
+
+      const tr =
+        document.createElement("tr");
+
+
+      const id =
+        withdrawal.id ?? "—";
+
+
+      const telegramId =
+        withdrawal.telegram_id ?? "—";
+
+
+      const method =
+        withdrawal.method ?? "—";
+
+
+      const address =
+        withdrawal.address ?? "—";
+
+
+      const amount =
+        Number(
+          withdrawal.amount || 0
+        );
+
+
+      const status =
+        String(
+          withdrawal.status || "unknown"
+        ).toLowerCase();
+
+
+      const createdAt =
+        withdrawal.created_at
+          ? formatDate(
+              withdrawal.created_at
+            )
+          : "—";
+
+
+      const userCell =
+        document.createElement("td");
+
+      userCell.innerHTML =
+        `
+        <strong>${escapeHtml(
+          String(telegramId)
+        )}</strong>
+        `;
+
+
+      const idCell =
+        document.createElement("td");
+
+      idCell.textContent =
+        `#${id}`;
+
+
+      const methodCell =
+        document.createElement("td");
+
+      methodCell.textContent =
+        formatMethod(method);
+
+
+      const addressCell =
+        document.createElement("td");
+
+      addressCell.style.maxWidth =
+        "230px";
+
+      addressCell.style.wordBreak =
+        "break-all";
+
+      addressCell.textContent =
+        address;
+
+
+      const amountCell =
+        document.createElement("td");
+
+      amountCell.innerHTML =
+        `<strong>${formatTRX(amount)} TRX</strong>`;
+
+
+      const statusCell =
+        document.createElement("td");
+
+      statusCell.innerHTML =
+        createStatusBadge(status);
+
+
+      const dateCell =
+        document.createElement("td");
+
+      dateCell.textContent =
+        createdAt;
+
+
+      const actionsCell =
+        document.createElement("td");
+
+      actionsCell.innerHTML =
+        createActionButtons(
+          withdrawal
+        );
+
+
+      tr.appendChild(
+        idCell
+      );
+
+      tr.appendChild(
+        userCell
+      );
+
+      tr.appendChild(
+        methodCell
+      );
+
+      tr.appendChild(
+        addressCell
+      );
+
+      tr.appendChild(
+        amountCell
+      );
+
+      tr.appendChild(
+        statusCell
+      );
+
+      tr.appendChild(
+        dateCell
+      );
+
+      tr.appendChild(
+        actionsCell
+      );
+
+
+      withdrawalsBody.appendChild(
+        tr
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+function createActionButtons(
+  withdrawal
+){
+
+  const status =
+    String(
+      withdrawal.status || ""
+    ).toLowerCase();
+
+
+  let html =
+    `<div class="actions">`;
+
+
+  if(status === "pending"){
+
+    html +=
+      `
+      <button
+        class="action-button approve"
+        data-action="approve"
+        data-id="${escapeAttribute(
+          withdrawal.id
+        )}"
+      >
+        ✅ Aprobar
+      </button>
+      `;
+
+
+    html +=
+      `
+      <button
+        class="action-button reject"
+        data-action="reject"
+        data-id="${escapeAttribute(
+          withdrawal.id
+        )}"
+      >
+        ❌ Rechazar
+      </button>
+      `;
+
+  }
+
+
+  if(
+    status === "pending" ||
+    status === "processing"
+  ){
+
+    html +=
+      `
+      <button
+        class="action-button process"
+        data-action="process"
+        data-id="${escapeAttribute(
+          withdrawal.id
+        )}"
+      >
+        🔄 Procesar
+      </button>
+      `;
+
+  }
+
+
+  if(
+    status === "completed"
+  ){
+
+    html +=
+      `<span style="color:#4ade80;font-size:11px">
+        ✓ Procesado
+      </span>`;
+
+  }
+
+
+  if(
+    status === "rejected"
+  ){
+
+    html +=
+      `<span style="color:#f87171;font-size:11px">
+        ✕ Rechazado
+      </span>`;
+
+  }
+
+
+  html +=
+    `</div>`;
+
+
+  return html;
+}
+
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+function createStatusBadge(
+  status
+){
+
+  const labels = {
+
+    pending:
+      "⏳ Pendiente",
+
+    processing:
+      "⚙️ Procesando",
+
+    completed:
+      "✅ Completado",
+
+    rejected:
+      "❌ Rechazado"
+
+  };
+
+
+  const label =
+    labels[status] ||
+    "❔ Desconocido";
+
+
+  const className =
+    [
+      "pending",
+      "processing",
+      "completed",
+      "rejected"
+    ].includes(status)
+      ? status
+      : "unknown";
+
+
+  return `
+    <span class="badge ${className}">
+      ${label}
+    </span>
+  `;
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+function updateStatistics(
+  withdrawals
+){
+
+  const list =
+    Array.isArray(withdrawals)
+      ? withdrawals
+      : [];
+
+
+  let pending = 0;
+
+  let processing = 0;
+
+  let completed = 0;
+
+  let rejected = 0;
+
+  let pendingAmount = 0;
+
+  let completedAmount = 0;
+
+
+  list.forEach(
+    withdrawal => {
+
+      const status =
+        String(
+          withdrawal.status || ""
+        ).toLowerCase();
+
+
+      const amount =
+        Number(
+          withdrawal.amount || 0
+        );
+
+
+      if(status === "pending"){
+
+        pending++;
+
+        pendingAmount +=
+          amount;
+
+      }
+
+
+      if(status === "processing"){
+
+        processing++;
+
+        pendingAmount +=
+          amount;
+
+      }
+
+
+      if(status === "completed"){
+
+        completed++;
+
+        completedAmount +=
+          amount;
+
+      }
+
+
+      if(status === "rejected"){
+
+        rejected++;
+
+      }
+
+    }
+  );
+
+
+  const total =
+    list.length;
+
+
+  const successRate =
+    total > 0
+      ? (
+          completed /
+          total *
+          100
+        )
+      : 0;
+
+
+  document.getElementById(
+    "stat-total"
+  ).textContent =
+    total;
+
+
+  document.getElementById(
+    "stat-pending"
+  ).textContent =
+    pending;
+
+
+  document.getElementById(
+    "stat-processing"
+  ).textContent =
+    processing;
+
+
+  document.getElementById(
+    "stat-completed"
+  ).textContent =
+    completed;
+
+
+  document.getElementById(
+    "stat-rejected"
+  ).textContent =
+    rejected;
+
+
+  document.getElementById(
+    "stat-pending-amount"
+  ).textContent =
+    formatTRX(
+      pendingAmount
+    );
+
+
+  document.getElementById(
+    "stat-completed-amount"
+  ).textContent =
+    formatTRX(
+      completedAmount
+    );
+
+
+  document.getElementById(
+    "stat-success-rate"
+  ).textContent =
+    `${successRate.toFixed(1)}%`;
+}
+
+
+/* =========================================================
+   OPERATIONS
+========================================================= */
+
+async function approveWithdrawal(
+  withdrawalId
+){
+
+  return executeWithdrawalOperation(
+    "approve",
+    withdrawalId
+  );
+}
+
+
+async function rejectWithdrawal(
+  withdrawalId
+){
+
+  return executeWithdrawalOperation(
+    "reject",
+    withdrawalId
+  );
+}
+
+
+async function processWithdrawal(
+  withdrawalId
+){
+
+  return executeWithdrawalOperation(
+    "process",
+    withdrawalId
+  );
+}
+
+
+/* =========================================================
+   OPERATION EXECUTION
+========================================================= */
+
+async function executeWithdrawalOperation(
+  operation,
+  withdrawalId
+){
+
+  if(
+    !AdminState.authenticated
+  ){
+
+    showToast(
+      "Administrador no autenticado."
+    );
+
+    return;
+  }
+
+
+  if(
+    AdminState.activeOperation
+  ){
+
+    showToast(
+      "Ya hay una operación en curso."
+    );
+
+    return;
+  }
+
+
+  AdminState.activeOperation = {
+    operation,
+    withdrawalId
+  };
+
+
+  try{
+
+    let url;
+
+    let message;
+
+
+    if(operation === "approve"){
+
+      url =
+        APPROVE_WITHDRAWAL_URL;
+
+      message =
+        "Aprobando retiro...";
+
+    }
+
+
+    if(operation === "reject"){
+
+      url =
+        REJECT_WITHDRAWAL_URL;
+
+      message =
+        "Rechazando retiro...";
+
+    }
+
+
+    if(operation === "process"){
+
+      url =
+        PROCESS_WITHDRAWAL_URL;
+
+      message =
+        "Procesando retiro...";
+
+    }
+
+
+    setLoading(
+      message
+    );
+
+
+    let result;
+
+
+    result =
+      await adminEdgeRequest(
+        url,
+        {
+          withdrawal_id:
+            withdrawalId
+        }
+      );
+
+
+    console.log(
+      `✅ Operación ${operation} completada:`,
+      result
+    );
+
+
+    showToast(
+      result?.message ||
+      "Operación realizada correctamente."
+    );
+
+
+    setSuccess(
+      "Administrador autenticado"
+    );
+
+
+    await loadWithdrawals();
+
+
+  }catch(error){
+
+    console.error(
+      `❌ Error operación ${operation}:`,
+      error
+    );
+
+
+    setSuccess(
+      "Administrador autenticado"
+    );
+
+
+    showToast(
+      `Error: ${error.message}`
+    );
+
+
+  }finally{
+
+    AdminState.activeOperation =
+      null;
+  }
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+let pendingModalAction =
+  null;
+
+
+function openConfirmation(
+  title,
+  message,
+  action
+){
+
+  modalTitle.textContent =
+    title;
+
+  modalMessage.textContent =
+    message;
+
+  pendingModalAction =
+    action;
+
+  modalOverlay.classList.add(
+    "visible"
+  );
+}
+
+
+function closeConfirmation(){
+
+  modalOverlay.classList.remove(
+    "visible"
+  );
+
+  pendingModalAction =
+    null;
+}
+
+
+modalCancel.addEventListener(
+  "click",
+  closeConfirmation
+);
+
+
+modalConfirm.addEventListener(
+  "click",
+  async () => {
+
+    if(!pendingModalAction){
+
+      closeConfirmation();
+
+      return;
+    }
+
+
+    const action =
+      pendingModalAction;
+
+
+    closeConfirmation();
+
+
+    await action();
+
+  }
+);
+
+
+/* =========================================================
+   TABLE ACTION DELEGATION
+========================================================= */
+
+withdrawalsBody.addEventListener(
+  "click",
+  event => {
+
+    const button =
+      event.target.closest(
+        "button[data-action]"
+      );
+
+
+    if(!button){
+      return;
+    }
+
+
+    const action =
+      button.dataset.action;
+
+
+    const withdrawalId =
+      button.dataset.id;
+
+
+    if(!withdrawalId){
+      return;
+    }
+
+
+    if(action === "approve"){
+
+      openConfirmation(
+        "Aprobar retiro",
+        `¿Confirmas que deseas aprobar el retiro #${withdrawalId}?`,
+        () =>
+          approveWithdrawal(
+            withdrawalId
+          )
+      );
+
+      return;
+    }
+
+
+    if(action === "reject"){
+
+      openConfirmation(
+        "Rechazar retiro",
+        `¿Confirmas que deseas rechazar el retiro #${withdrawalId}? El saldo será gestionado por la lógica server-side correspondiente.`,
+        () =>
+          rejectWithdrawal(
+            withdrawalId
+          )
+      );
+
+      return;
+    }
+
+
+    if(action === "process"){
+
+      openConfirmation(
+        "Procesar retiro",
+        `¿Deseas procesar/reintentar el pago del retiro #${withdrawalId}?`,
+        () =>
+          processWithdrawal(
+            withdrawalId
+          )
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+refreshMain.addEventListener(
+  "click",
+  async () => {
+
+    if(
+      !AdminState.authenticated
+    ){
+
+      await authenticateAdmin();
+
+      return;
+    }
+
+
+    await loadWithdrawals();
+
+  }
+);
+
+
+/* =========================================================
+   FILTER BUTTONS
+========================================================= */
+
+filterButton.addEventListener(
+  "click",
+  applyFilters
+);
+
+
+searchInput.addEventListener(
+  "keydown",
+  event => {
+
+    if(event.key === "Enter"){
+
+      applyFilters();
+
+    }
+
+  }
+);
+
+
+statusFilter.addEventListener(
+  "change",
+  applyFilters
+);
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function formatTRX(
+  amount
+){
+
+  return Number(
+    amount || 0
+  ).toFixed(6);
+}
+
+
+function formatMethod(
+  method
+){
+
+  const value =
+    String(
+      method || ""
+    ).toLowerCase();
+
+
+  if(value === "faucetpay"){
+
+    return "FaucetPay";
+  }
+
+
+  if(value === "tron_network"){
+
+    return "TRON";
+  }
+
+
+  return method || "—";
+}
+
+
+function formatDate(
+  value
+){
+
+  try{
+
+    return new Date(
+      value
+    ).toLocaleString(
+      "es-NI",
+      {
+        dateStyle:"short",
+        timeStyle:"short"
+      }
+    );
+
+  }catch{
+
+    return "—";
+  }
+}
+
+
+function escapeHtml(
+  value
+){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+
+function escapeAttribute(
+  value
+){
+
+  return escapeHtml(
+    value
+  );
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    console.log(
+      "🚀 CryptoMine Admin iniciando..."
+    );
+
+
+    const telegramReady =
+      initializeTelegram();
+
+
+    if(!telegramReady){
+      return;
+    }
+
+
+    await authenticateAdmin();
+
+  }
+);
+
+
+/* =========================================================
+   RETRY
+========================================================= */
+
+retryButton.addEventListener(
+  "click",
+  async () => {
+
+    console.log(
+      "🔄 Reintentando autenticación..."
+    );
+
+    await authenticateAdmin();
+
+  }
+);
+
+
+/* =========================================================
+   FINAL
+========================================================= */
+
+console.log(
+  "===================================="
+);
+
+console.log(
+  "🛡️ CryptoMine Admin frontend cargado"
+);
+
+console.log(
+  "🔐 Seguridad server-side habilitada"
+);
+
+console.log(
+  "===================================="
+);
+
+</script>
 
 </body>
 </html>
