@@ -2028,16 +2028,17 @@ async function loadWithdrawals(){
       );
 
 
-    if(
-      !result ||
-      result.success !== true
-    ){
-
-      throw new Error(
-        result?.message ||
-        "No fue posible cargar los retiros."
-      );
-    }
+      if(
+        !result ||
+        result.success !== true
+      ){
+      
+        throw new Error(
+          result?.error ||
+          result?.message ||
+          "No fue posible cargar los retiros."
+        );
+      }
 
 
     AdminState.withdrawals =
