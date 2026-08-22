@@ -2905,11 +2905,23 @@ withdrawalsBody.addEventListener(
       button.dataset.action;
 
 
-    const withdrawalId =
-      button.dataset.id;
-
-
-    if(!withdrawalId){
+      const withdrawalId =
+      Number(button.dataset.id);
+    
+    
+    if(
+      !Number.isSafeInteger(withdrawalId) ||
+      withdrawalId <= 0
+    ){
+      console.error(
+        "❌ withdrawal_id inválido:",
+        button.dataset.id
+      );
+    
+      showToast(
+        "Error: ID de retiro inválido."
+      );
+    
       return;
     }
 
