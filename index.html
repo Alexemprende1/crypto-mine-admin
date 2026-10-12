@@ -2369,6 +2369,227 @@ adminTabButtons.forEach((button) => {
 
 
 /* =========================================================
+   AUDITORÍAS VISUALES — MODO DEMOSTRACIÓN
+   Sin conexión a Supabase
+========================================================= */
+
+const classicMiningInput =
+  document.getElementById("mining-search-input");
+
+const classicMiningButton =
+  document.getElementById("mining-search-button");
+
+const classicMiningStatus =
+  document.getElementById("mining-status");
+
+const classicMiningResults =
+  document.getElementById("classic-mining-results");
+
+
+const minesSearchInput =
+  document.getElementById("mines-search-input");
+
+const minesSearchButton =
+  document.getElementById("mines-search-button");
+
+const minesStatus =
+  document.getElementById("mines-status");
+
+const minesResults =
+  document.getElementById("mines-results");
+
+
+function runDemoAudit(mode) {
+
+  const isClassic = mode === "classic";
+
+  const input = isClassic
+    ? classicMiningInput
+    : minesSearchInput;
+
+  const status = isClassic
+    ? classicMiningStatus
+    : minesStatus;
+
+  const results = isClassic
+    ? classicMiningResults
+    : minesResults;
+
+  if (!input || !status || !results) {
+    console.error(
+      "No se encontraron los elementos de auditoría:",
+      mode
+    );
+    return;
+  }
+
+  const searchValue = input.value.trim();
+
+  if (!searchValue) {
+    status.textContent =
+      "⚠️ Introduce un Telegram ID o username.";
+
+    results.replaceChildren();
+    input.focus();
+    return;
+  }
+
+  const safeSearch = escapeHtml(searchValue);
+
+  status.textContent =
+    "🧪 Modo demostración: resultado ficticio. No se consultó Supabase.";
+
+  if (isClassic) {
+
+    results.innerHTML = `
+      <div class="panel" style="margin-top:15px">
+
+        <div class="panel-header">
+          <div>
+            <h2>📋 Resultado de minería clásica</h2>
+            <p class="panel-description">
+              Búsqueda introducida: ${safeSearch}
+            </p>
+          </div>
+        </div>
+
+        <div class="security-note"
+             style="margin-bottom:15px;color:#fbbf24">
+          🧪 DEMOSTRACIÓN — Estos datos son ficticios.
+          No representan una cuenta real.
+        </div>
+
+        <div class="stat-card" style="margin-bottom:10px">
+          <div class="stat-label">ESTADO DE SESIÓN</div>
+          <div class="stat-value" style="font-size:18px">
+            Ejemplo visual
+          </div>
+          <div class="stat-sub">
+            Sesión de minería simulada
+          </div>
+        </div>
+
+        <div class="stat-card" style="margin-bottom:10px">
+          <div class="stat-label">RECOMPENSA DE EJEMPLO</div>
+          <div class="stat-value">0.000050 TRX</div>
+          <div class="stat-sub">
+            Importe ficticio para probar el diseño
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">BOOSTERS</div>
+          <div class="stat-value" style="font-size:18px">
+            Datos no consultados
+          </div>
+          <div class="stat-sub">
+            Pendiente de conexión con el backend
+          </div>
+        </div>
+
+      </div>
+    `;
+
+  } else {
+
+    results.innerHTML = `
+      <div class="panel" style="margin-top:15px">
+
+        <div class="panel-header">
+          <div>
+            <h2>💣 Resultado de Crypto Mines</h2>
+            <p class="panel-description">
+              Búsqueda introducida: ${safeSearch}
+            </p>
+          </div>
+        </div>
+
+        <div class="security-note"
+             style="margin-bottom:15px;color:#fbbf24">
+          🧪 DEMOSTRACIÓN — Estos datos son ficticios.
+          No representan partidas reales.
+        </div>
+
+        <div class="stat-card" style="margin-bottom:10px">
+          <div class="stat-label">ESTADO DE PARTIDA</div>
+          <div class="stat-value" style="font-size:18px">
+            Ejemplo visual
+          </div>
+          <div class="stat-sub">
+            Partida simulada, no recuperada de la base de datos
+          </div>
+        </div>
+
+        <div class="stat-card" style="margin-bottom:10px">
+          <div class="stat-label">RESULTADO</div>
+          <div class="stat-value" style="font-size:18px">
+            No verificado
+          </div>
+          <div class="stat-sub">
+            No se han consultado ganancias ni pérdidas reales
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">HISTORIAL DE PARTIDAS</div>
+          <div class="stat-value" style="font-size:18px">
+            Pendiente
+          </div>
+          <div class="stat-sub">
+            Se habilitará al conectar el backend
+          </div>
+        </div>
+
+      </div>
+    `;
+  }
+}
+
+
+/* Botones de auditoría */
+
+if (classicMiningButton) {
+  classicMiningButton.addEventListener(
+    "click",
+    () => runDemoAudit("classic")
+  );
+}
+
+if (minesSearchButton) {
+  minesSearchButton.addEventListener(
+    "click",
+    () => runDemoAudit("mines")
+  );
+}
+
+
+/* Permitir buscar pulsando Enter */
+
+if (classicMiningInput) {
+  classicMiningInput.addEventListener(
+    "keydown",
+    event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        runDemoAudit("classic");
+      }
+    }
+  );
+}
+
+if (minesSearchInput) {
+  minesSearchInput.addEventListener(
+    "keydown",
+    event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        runDemoAudit("mines");
+      }
+    }
+  );
+}
+
+/* =========================================================
    FILTERS
 ========================================================= */
 
