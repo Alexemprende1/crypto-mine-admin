@@ -1411,6 +1411,8 @@ const SUPABASE_ANON_KEY =
 const ADMIN_AUTH_URL =
   `${SUPABASE_URL}/functions/v1/admin-auth`;
 
+  const ADMIN_MINING_URL =
+  `${SUPABASE_URL}/functions/v1/admin-mining`;
 
 const APPROVE_WITHDRAWAL_URL =
   `${SUPABASE_URL}/functions/v1/approve-withdrawal-admin`;
@@ -2545,13 +2547,292 @@ function runDemoAudit(mode) {
   }
 }
 
+/* =========================================================
+   AUDITORÍA REAL DE MINERÍA CLÁSICA
+   Conexión protegida mediante la Edge Function admin-mining
+========================================================= */
+
+async function auditClassicMining() {
+  const searchValue = classicMiningInput.value.trim();
+
+  if (!searchValue) {
+    classicMiningStatus.textContent =
+      "⚠️ Introduce un Telegram ID o username.";
+    classicMiningResults.replaceChildren();
+    classicMiningInput.focus();
+    return;
+  }
+
+  if (!AdminState.authenticated) {
+    classicMiningStatus.textContent =
+      "❌ El administrador no está autenticado.";
+    return;
+  }
+
+  // Admite un Telegram ID o un username con o sin @.
+  const search = searchValue.replace(/^@/, "");
+
+  const payload = /^\d+$/.test(search)
+    ? { telegram_id: search }
+    : { username: search };
+
+  classicMiningButton.disabled = true;
+  classicMiningButton.textContent = "Consultando...";
+  classicMiningStatus.textContent =
+    "⏳ Consultando la auditoría real en Supabase...";
+  classicMiningResults.replaceChildren();
+
+  try {
+    const result = await adminEdgeRequest(
+      ADMIN_MINING_URL,
+      payload
+    );
+
+    if (!result || result.success !== true || !result.user) {
+      throw new Error(
+        result?.error || "La respuesta de auditoría no es válida."
+      );
+    }
+
+    renderClassicMiningAudit(result);
+
+    classicMiningStatus.textContent =
+      "✅ Auditoría real completada. Datos obtenidos de Supabase.";
+
+  } catch (error) {
+    console.error(
+      "[admin-mining] Error en auditoría clásica:",
+      error
+    );
+
+    classicMiningStatus.textContent =
+      `❌ No se pudo completar la auditoría: ${error.message}`;
+
+    classicMiningResults.replaceChildren();
+
+    showToast(
+      `Error de auditoría: ${error.message}`
+    );
+
+  } finally {
+    classicMiningButton.disabled = false;
+    classicMiningButton.textContent = "🔎 Auditar";
+  }
+}
+
+
+/* =========================================================
+   MOSTRAR RESULTADOS REALES
+========================================================= */
+
+function renderClassicMiningAudit(data) {
+  const user = data.user || {};
+  const classic = data.classic_mining || {};
+  const premium = data.premium_mining || {};
+  const audit = data.audit || {};
+
+  const formatReward = value => {
+    const number = Number(value ?? 0);
+    return Number.isFinite(number)
+      ? number.toFixed(8)
+      : "0.00000000";
+  };
+
+  const formatCount = value => {
+    const number = Number(value ?? 0);
+    return Number.isFinite(number) ? String(number) : "0";
+  };
+
+  const difference = Number(audit.diferencia ?? 0);
+  const differenceColor =
+    Number.isFinite(difference) && Math.abs(difference) < 0.00000001
+      ? "#4ade80"
+      : "#fbbf24";
+
+  const classicSessions = Array.isArray(data.classic_sessions)
+    ? data.classic_sessions
+    : [];
+
+  const premiumSessions = Array.isArray(data.premium_sessions)
+    ? data.premium_sessions
+    : [];
+
+  const displayName = [
+    user.first_name || "",
+    user.username ? `(@${String(user.username).replace(/^@/, "")})` : ""
+  ].filter(Boolean).join(" ");
+
+  const classicRows = classicSessions.length
+    ? classicSessions.map(session => `
+        <tr>
+          <td>#${escapeHtml(String(session.session_id ?? "—"))}</td>
+          <td>${escapeHtml(
+            session.started_at ? formatDate(session.started_at) : "—"
+          )}</td>
+          <td>${formatReward(session.recompensa_base)} TRX</td>
+          <td>${session.booster_x2 ? "Sí (x2)" : "No"}</td>
+          <td><strong>${formatReward(session.recompensa_real)} TRX</strong></td>
+        </tr>
+      `).join("")
+    : `<tr><td colspan="5">No hay sesiones clásicas reclamadas para mostrar.</td></tr>`;
+
+  const premiumRows = premiumSessions.length
+    ? premiumSessions.map(session => `
+        <tr>
+          <td>#${escapeHtml(String(session.session_id ?? "—"))}</td>
+          <td>${escapeHtml(
+            session.finish_at ? formatDate(session.finish_at) : "—"
+          )}</td>
+          <td><strong>${formatReward(session.recompensa)} TRX</strong></td>
+          <td>${session.claimed ? "Sí" : "No"}</td>
+        </tr>
+      `).join("")
+    : `<tr><td colspan="4">No hay sesiones premium reclamadas para mostrar.</td></tr>`;
+
+  classicMiningResults.innerHTML = `
+    <div class="panel" style="margin-top:15px">
+
+      <div class="panel-header">
+        <div>
+          <h2>📋 Auditoría real de minería</h2>
+          <p class="panel-description">
+            Usuario: ${escapeHtml(displayName || "Sin nombre")}
+            · Telegram ID: ${escapeHtml(String(user.telegram_id ?? "—"))}
+          </p>
+          <p class="panel-description">
+            Registro desde: ${escapeHtml(
+              user.created_at ? formatDate(user.created_at) : "—"
+            )}
+          </p>
+        </div>
+      </div>
+
+      <div class="dashboard" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+
+        <div class="stat-card">
+          <div class="stat-label">SESIONES CLÁSICAS RECLAMADAS</div>
+          <div class="stat-value">
+            ${formatCount(classic.sesiones_mineria_clasica)}
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">SESIONES CON BOOSTER X2</div>
+          <div class="stat-value">
+            ${formatCount(classic.sesiones_con_booster)}
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">RECOMPENSA BASE CLÁSICA</div>
+          <div class="stat-value" style="font-size:18px">
+            ${formatReward(classic.recompensa_base_mineria)} TRX
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">BONUS CALCULADO DE BOOSTER</div>
+          <div class="stat-value" style="font-size:18px">
+            ${formatReward(classic.bonus_booster)} TRX
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">TOTAL CLÁSICO CALCULADO</div>
+          <div class="stat-value" style="font-size:18px">
+            ${formatReward(classic.total_mineria_clasica)} TRX
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">TOTAL PREMIUM RECLAMADO</div>
+          <div class="stat-value" style="font-size:18px">
+            ${formatReward(premium.total_mineria_premium)} TRX
+          </div>
+          <div class="stat-sub">
+            ${formatCount(premium.sesiones_premium)} sesiones premium
+          </div>
+        </div>
+
+      </div>
+
+      <div class="stat-card" style="margin-bottom:15px">
+        <div class="stat-label">TOTAL MINED REGISTRADO EN users_tma</div>
+        <div class="stat-value" style="font-size:20px">
+          ${formatReward(audit.total_mined_users_tma)} TRX
+        </div>
+      </div>
+
+      <div class="stat-card" style="margin-bottom:15px">
+        <div class="stat-label">TOTAL CALCULADO DESDE LAS SESIONES</div>
+        <div class="stat-value" style="font-size:20px">
+          ${formatReward(audit.total_mineria_calculado)} TRX
+        </div>
+      </div>
+
+      <div class="stat-card" style="margin-bottom:20px">
+        <div class="stat-label">DIFERENCIA DE AUDITORÍA</div>
+        <div class="stat-value"
+             style="font-size:20px;color:${differenceColor}">
+          ${formatReward(audit.diferencia)} TRX
+        </div>
+        <div class="stat-sub">
+          Diferencia = total_mined registrado menos total calculado.
+          Debe revisarse si no es cero.
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:10px">⛏️ Sesiones clásicas reclamadas</h3>
+      <div class="table-wrapper" style="margin-bottom:22px">
+        <table class="withdrawals-table" style="min-width:650px">
+          <thead>
+            <tr>
+              <th>Sesión</th>
+              <th>Fecha</th>
+              <th>Base</th>
+              <th>Booster</th>
+              <th>Recompensa calculada</th>
+            </tr>
+          </thead>
+          <tbody>${classicRows}</tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-bottom:10px">⚡ Sesiones premium reclamadas</h3>
+      <div class="table-wrapper">
+        <table class="withdrawals-table" style="min-width:550px">
+          <thead>
+            <tr>
+              <th>Sesión</th>
+              <th>Finalización</th>
+              <th>Recompensa</th>
+              <th>Reclamada</th>
+            </tr>
+          </thead>
+          <tbody>${premiumRows}</tbody>
+        </table>
+      </div>
+
+      <p class="security-note" style="margin-top:15px">
+        La respuesta procede de la Edge Function admin-mining.
+        Las tablas de esta vista incluyen las sesiones que la función
+        devuelve como reclamadas; no representan necesariamente todo
+        el historial de sesiones.
+      </p>
+
+    </div>
+  `;
+}
+
 
 /* Botones de auditoría */
+
+/* Botón de auditoría clásica: consulta real */
 
 if (classicMiningButton) {
   classicMiningButton.addEventListener(
     "click",
-    () => runDemoAudit("classic")
+    auditClassicMining
   );
 }
 
@@ -2571,7 +2852,7 @@ if (classicMiningInput) {
     event => {
       if (event.key === "Enter") {
         event.preventDefault();
-        runDemoAudit("classic");
+        auditClassicMining();
       }
     }
   );
