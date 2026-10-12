@@ -200,6 +200,54 @@ button{
 }
 
 /* =========================================================
+   ADMIN TABS
+========================================================= */
+
+.admin-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.admin-tab{
+  border:1px solid #334155;
+  background:#111827;
+  color:#94a3b8;
+  border-radius:12px;
+  padding:13px 10px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.admin-tab.active{
+  color:#fbbf24;
+  background:#1c2433;
+  border-color:#d97706;
+}
+
+.admin-tab-panel{
+  display:none;
+}
+
+.admin-tab-panel.active{
+  display:block;
+}
+
+@media(max-width:600px){
+  .admin-tabs{
+    gap:6px;
+  }
+
+  .admin-tab{
+    padding:12px 5px;
+    font-size:11px;
+  }
+}
+
+
+
+/* =========================================================
    DASHBOARD
 ========================================================= */
 
@@ -753,12 +801,118 @@ button{
 
 <div id="admin-content">
 
+  <!-- =====================================================
+     ADMIN NAVIGATION
+====================================================== -->
+
+<nav class="admin-tabs" aria-label="Secciones administrativas">
+
+  <button
+    id="tab-btn-classic"
+    class="admin-tab active"
+    type="button"
+    data-tab="classic"
+  >
+    ⛏️ Minería clásica
+  </button>
+
+  <button
+    id="tab-btn-mines"
+    class="admin-tab"
+    type="button"
+    data-tab="mines"
+  >
+    💣 Crypto Mines
+  </button>
+
+  <button
+    id="tab-btn-withdrawals"
+    class="admin-tab"
+    type="button"
+    data-tab="withdrawals"
+  >
+    💰 Retiros
+  </button>
+
+</nav>
+
+<!-- =====================================================
+     CLASSIC MINING PANEL
+====================================================== -->
+
+<section
+  id="classic-mining-panel"
+  class="panel admin-tab-panel active"
+>
+  <div class="panel-header">
+    <div>
+      <h2>⛏️ Auditoría de minería clásica</h2>
+      <p class="panel-description">
+        Consulta las sesiones, los boosters y las recompensas
+        de cada usuario.
+      </p>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input
+      id="mining-search-input"
+      class="input"
+      type="text"
+      placeholder="Telegram ID o username..."
+      autocomplete="off"
+    >
+
+    <div></div>
+
+    <button
+      id="mining-search-button"
+      class="filter-button"
+      type="button"
+    >
+      🔎 Auditar
+    </button>
+  </div>
+
+  <div
+    id="mining-status"
+    class="security-note"
+    role="status"
+    aria-live="polite"
+  >
+    Introduce el Telegram ID o username del usuario.
+  </div>
+
+  <div id="classic-mining-results"></div>
+</section>
+
+<!-- =====================================================
+     CRYPTO MINES PANEL — SIGUIENTE ETAPA
+====================================================== -->
+
+<section
+  id="crypto-mines-panel"
+  class="panel admin-tab-panel"
+>
+  <div class="panel-header">
+    <div>
+      <h2>💣 Auditoría de Crypto Mines</h2>
+      <p class="panel-description">
+        Esta sección se conectará en la siguiente etapa.
+      </p>
+    </div>
+  </div>
+</section>
+
 
   <!-- =====================================================
        ESTADÍSTICAS
   ====================================================== -->
 
-  <section class="dashboard">
+  <section
+  id="withdrawals-dashboard"
+  class="dashboard admin-tab-panel"
+>
 
     <div class="stat-card">
 
@@ -934,7 +1088,10 @@ button{
        RETIROS
   ====================================================== -->
 
-  <section class="panel">
+  <section
+  id="withdrawals-panel"
+  class="panel admin-tab-panel"
+>
 
     <div class="panel-header">
 
@@ -2077,6 +2234,87 @@ async function loadWithdrawals(){
       false;
   }
 }
+
+/* =========================================================
+   ADMIN TAB NAVIGATION
+========================================================= */
+
+const adminTabButtons = document.querySelectorAll(
+  ".admin-tab"
+);
+
+const adminTabPanels = {
+  classic: document.getElementById(
+    "classic-mining-panel"
+  ),
+
+  mines: document.getElementById(
+    "crypto-mines-panel"
+  ),
+
+  withdrawals: [
+    document.getElementById(
+      "withdrawals-dashboard"
+    ),
+
+    document.getElementById(
+      "withdrawals-panel"
+    )
+  ]
+};
+
+function activateAdminTab(tabName) {
+  const selectedPanel =
+    adminTabPanels[tabName];
+
+  if (!selectedPanel) {
+    console.error(
+      "Pestaña administrativa desconocida:",
+      tabName
+    );
+    return;
+  }
+
+  adminTabButtons.forEach((button) => {
+    const isActive =
+      button.dataset.tab === tabName;
+
+    button.classList.toggle(
+      "active",
+      isActive
+    );
+
+    button.setAttribute(
+      "aria-pressed",
+      String(isActive)
+    );
+  });
+
+  Object.entries(adminTabPanels).forEach(
+    ([name, panel]) => {
+      const panels = Array.isArray(panel)
+        ? panel
+        : [panel];
+
+      panels.forEach((element) => {
+        if (!element) return;
+
+        element.classList.toggle(
+          "active",
+          name === tabName
+        );
+      });
+    }
+  );
+}
+
+adminTabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activateAdminTab(
+      button.dataset.tab
+    );
+  });
+});
 
 
 /* =========================================================
