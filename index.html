@@ -362,6 +362,17 @@ button{
 }
 
 /* =========================================================
+BUSCADOR DE MINERÍA CLÁSICA
+========================================================= */
+
+.mining-search{
+display:grid;
+grid-template-columns:minmax(0,1fr) auto;
+gap:10px;
+margin-bottom:17px;
+}
+
+/* =========================================================
    TABLE
 ========================================================= */
 
@@ -695,6 +706,10 @@ button{
     grid-template-columns:1fr;
   }
 
+  .mining-search{
+  grid-template-columns:1fr;
+}
+
   .panel{
     padding:15px;
   }
@@ -859,25 +874,25 @@ button{
     </div>
   </div>
 
-  <div class="filters">
-    <input
-      id="mining-search-input"
-      class="input"
-      type="text"
-      placeholder="Telegram ID o username..."
-      autocomplete="off"
-    >
-
-    <div></div>
-
+  <div class="mining-search"><input
+    id="mining-search-input"
+    class="input"
+    type="text"
+    placeholder="Telegram ID o username..."
+    autocomplete="off"
+    
+    «»
+    
     <button
-      id="mining-search-button"
-      class="filter-button"
-      type="button"
-    >
-      🔎 Auditar
-    </button>
-  </div>
+    id="mining-search-button"
+    class="filter-button"
+    type="button"
+    
+    «»
+    
+    🔎 Auditar
+    
+      </button></div>
 
   <div
     id="mining-status"
